@@ -1,0 +1,36 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - task-network
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+    networks:
+      - task-network
+    environment:
+      - DATABASE_URL=postgresql://taskuser:taskpassword@database:5432/taskdb
+
+  database:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=taskdb
+      - POSTGRES_USER=taskuser
+      - POSTGRES_PASSWORD=taskpassword
+    networks:
+      - task-network
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+networks:
+  task-network:
+    driver: bridge
+
+volumes:
+  db-data:
