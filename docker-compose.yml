@@ -1,3 +1,5 @@
+version: '3'
+
 services:
   frontend:
     build: ./frontend
@@ -15,7 +17,7 @@ services:
     networks:
       - task-network
     environment:
-      - DATABASE_URL=postgresql://taskuser:taskpassword@database:5432/taskdb
+      - DATABASE_URL=postgresql://user:password@database:5432/taskdb
 
   database:
     image: postgres:13
@@ -27,6 +29,47 @@ services:
       - task-network
     volumes:
       - db-data:/var/lib/postgresql/data
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - task-network
+
+  prometheus:
+    build: ./prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+      - cadvisor
+    networks:
+      - task-network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3033:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - task-network
+
+  cadvisor:
+    image: google/cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - task-network
 
 networks:
   task-network:
