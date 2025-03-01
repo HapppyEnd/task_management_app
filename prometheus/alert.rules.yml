@@ -1,0 +1,11 @@
+groups:
+- name: example
+  rules:
+  - alert: HighCPUUsage
+    expr: rate(container_cpu_usage_seconds_total{name="task_management_app-backend-1"}[1m]) > 0.8
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High CPU usage detected"
+      description: "CPU usage for {{ $labels.instance }} is above 80% for 5 minutes."
