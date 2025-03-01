@@ -54,6 +54,8 @@ services:
       - "3033:3000"
     depends_on:
       - prometheus
+    volumes:
+      - grafana-data:/var/lib/grafana
     networks:
       - task-network
 
@@ -75,3 +77,4 @@ networks:
 
 volumes:
   db-data:
+  grafana-data:
